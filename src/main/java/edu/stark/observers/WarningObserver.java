@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WarningObserver implements SuitObserver {
+    private static final int LOW_ENERGY_THRESHOLD = 20;
+    private static final int LOW_ARMOR_THRESHOLD = 30;
+
     private final String assistant;
     private final List<String> pendingWarnings = new ArrayList<>();
     private boolean lowEnergy;

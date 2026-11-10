@@ -6,13 +6,13 @@ import edu.stark.weapons.WeaponStrategy;
 import java.util.List;
 
 /** Turns attacks, defense, victory and defeat into a cohesive mission. */
-public class MissionManager {
+public class MissionSession {
     private final IronManSuit suit;
     private final List<MissionResult> history;
     private MissionScenario scenario;
     private Enemy enemy;
 
-    public MissionManager(IronManSuit suit, List<MissionResult> history) {
+    public MissionSession(IronManSuit suit, List<MissionResult> history) {
         this.suit = suit;
         this.history = history;
     }

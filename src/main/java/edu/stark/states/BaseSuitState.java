@@ -3,7 +3,6 @@ package edu.stark.states;
 import edu.stark.core.ActionResult;
 import edu.stark.suits.IronManSuit;
 
-/** Common defaults. Subclasses override behavior allowed by their state. */
 public abstract class BaseSuitState implements SuitState {
     private ActionResult denied(String action) {
         return ActionResult.fail(action + " is not allowed while suit is " + name() + ".");

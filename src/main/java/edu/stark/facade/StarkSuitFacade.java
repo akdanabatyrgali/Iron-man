@@ -2,10 +2,11 @@ package edu.stark.facade;
 
 import edu.stark.commands.*;
 import edu.stark.core.ActionResult;
-import edu.stark.missions.MissionManager;
+import edu.stark.missions.MissionSession;
 import edu.stark.missions.MissionResult;
 import edu.stark.missions.MissionScenario;
 import edu.stark.observers.WarningObserver;
+import edu.stark.core.SuitOutputFormatter;
 import edu.stark.suits.*;
 import edu.stark.weapons.*;
 import java.util.ArrayList;
@@ -17,8 +18,9 @@ public class StarkSuitFacade {
     private final List<MissionResult> history = new ArrayList<>();
     private IronManSuit suit;
     private WarningObserver warnings;
-    private MissionManager mission;
+    private MissionSession mission;
     private WeaponStrategy weapon;
+    private final SuitOutputFormatter formatter = new SuitOutputFormatter();
 
     public ActionResult selectSuit(SuitType type) {
         if (mission != null && mission.inMission()) {
@@ -33,7 +35,7 @@ public class StarkSuitFacade {
         suit = creator.createSuit(); // Factory Method is in each concrete creator
         warnings = new WarningObserver(suit.assistant());
         suit.addObserver(warnings); // Observer subscription
-        mission = new MissionManager(suit, history);
+        mission = new MissionSession(suit, history);
         weapon = new RepulsorStrategy();
         return ActionResult.ok("[" + suit.assistant() + "] " + suit.name()
                 + " selected. State: STANDBY. Default weapon: Repulsor.");
@@ -73,18 +75,9 @@ public class StarkSuitFacade {
     }
     public String status() {
         if (suit == null) return "No suit selected. Choose a suit first.";
-        String result = "Suit: " + suit.name() + "\nAssistant: " + suit.assistant()
-                + "\nState: " + suit.stateName() + "\nEnergy: " + suit.energy() + "/" + suit.maxEnergy()
-                + "\nArmor: " + suit.armor() + "/" + suit.maxArmor()
-                + "\nWeapon: " + weapon.type().displayName()
-                + "\nAvailable weapons: " + suit.supportedWeapons().stream()
-                    .map(WeaponType::displayName).collect(Collectors.joining(", "));
-        if (mission.inMission()) {
-            result += "\nEnemy: " + mission.enemy().name() + " (HP "
-                    + mission.enemy().health() + "/" + mission.enemy().maxHealth() + ")";
-        }
-        return result;
+        return formatter.status(suit, weapon, mission.inMission() ? mission.enemy() : null);
     }
+
     public String missionHistory() {
         if (history.isEmpty()) return "No completed missions yet.";
         StringBuilder sb = new StringBuilder("MISSION HISTORY\n");

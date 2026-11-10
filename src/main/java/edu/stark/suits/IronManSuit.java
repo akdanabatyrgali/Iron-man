@@ -7,11 +7,8 @@ import edu.stark.states.DamagedState;
 import edu.stark.states.StandbyState;
 import edu.stark.states.SuitState;
 import edu.stark.weapons.WeaponType;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
 
 public abstract class IronManSuit {
     private final SuitType type;
@@ -26,11 +23,15 @@ public abstract class IronManSuit {
 
     protected IronManSuit(SuitType type, int maxEnergy, int maxArmor,
                           String assistant, Set<WeaponType> supportedWeapons) {
-        this.type = type;
+        if (maxEnergy <= 0 || maxArmor <= 0) {
+            throw new IllegalArgumentException("Suit energy and armor must be positive.");
+        }
+        this.type = Objects.requireNonNull(type, "type");
         this.maxEnergy = maxEnergy;
         this.maxArmor = maxArmor;
-        this.assistant = assistant;
-        this.supportedWeapons = Collections.unmodifiableSet(EnumSet.copyOf(supportedWeapons));
+        this.assistant = Objects.requireNonNull(assistant, "assistant");
+        this.supportedWeapons = Collections.unmodifiableSet(
+                EnumSet.copyOf(Objects.requireNonNull(supportedWeapons, "supportedWeapons")));
         this.energy = maxEnergy;
         this.armor = maxArmor;
     }
@@ -48,30 +49,48 @@ public abstract class IronManSuit {
     public double blockingEfficiency() { return 0.50; }
     public String defenseDescription() { return "Defensive stance"; }
 
+
     public void addObserver(SuitObserver observer) {
-        observers.add(observer);
-        observer.onSuitChanged(snapshot());
+        Objects.requireNonNull(observer, "observer");
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+            observer.onSuitChanged(snapshot());
+        }
     }
-    private SuitStatus snapshot() { return new SuitStatus(type, energy, armor, state.name()); }
-    private void notifyObservers() {
-        SuitStatus status = snapshot();
-        for (SuitObserver observer : observers) observer.onSuitChanged(status);
+
+    public void removeObserver(SuitObserver observer) {
+        observers.remove(observer);
     }
-    public void setState(SuitState newState) {
-        this.state = newState;
+
+    public void transitionFrom(SuitState currentState, SuitState nextState) {
+        Objects.requireNonNull(nextState, "nextState");
+        if (state != currentState) {
+            throw new IllegalStateException("State changed before this transition.");
+        }
+        state = nextState;
         notifyObservers();
     }
+
     public boolean useEnergy(int amount) {
-        if (amount < 0) throw new IllegalArgumentException("Negative energy cost");
-        if (energy < amount) return false;
+        if (amount < 0) {
+            throw new IllegalArgumentException("Negative energy cost");
+        }
+        if (energy < amount) {
+            return false;
+        }
         energy -= amount;
         notifyObservers();
         return true;
     }
+
     public void takeDamage(int amount) {
-        if (amount < 0) throw new IllegalArgumentException("Negative damage");
+        if (amount < 0) {
+            throw new IllegalArgumentException("Negative damage");
+        }
         armor = Math.max(0, armor - amount);
-        if (armor == 0) state = new DamagedState();
+        if (armor == 0) {
+            state = new DamagedState();
+        }
         notifyObservers();
     }
     public void restoreEnergy() { energy = maxEnergy; notifyObservers(); }
@@ -83,5 +102,18 @@ public abstract class IronManSuit {
     public ActionResult fly() { return state.fly(this); }
     public ActionResult recharge() { return state.recharge(this); }
     public ActionResult repair() { return state.repair(this); }
+
+    private SuitStatus snapshot() {
+        return new SuitStatus(type, energy, armor, state.name());
+    }
+
+    private void notifyObservers() {
+        SuitStatus status = snapshot();
+
+        for (SuitObserver observer : List.copyOf(observers)) {
+            observer.onSuitChanged(status);
+        }
+    }
+
 }
 

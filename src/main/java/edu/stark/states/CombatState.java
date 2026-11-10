@@ -7,7 +7,7 @@ public class CombatState extends BaseSuitState {
     @Override public String name() { return "COMBAT"; }
     @Override public boolean canAttack() { return true; }
     @Override public ActionResult endMission(IronManSuit suit) {
-        suit.setState(new ActiveState());
+        suit.transitionFrom(this, new ActiveState());
         return ActionResult.ok("Combat ended. Suit is ACTIVE.");
     }
     @Override public ActionResult fly(IronManSuit suit) {

@@ -7,7 +7,7 @@ public class StandbyState extends BaseSuitState {
     @Override public String name() { return "STANDBY"; }
     @Override public ActionResult activate(IronManSuit suit) {
         if (suit.energy() == 0) return ActionResult.fail("Charge the reactor before activation.");
-        suit.setState(new ActiveState());
+        suit.transitionFrom(this, new ActiveState());
         return ActionResult.ok(suit.name() + " activated. All systems online.");
     }
     @Override public ActionResult recharge(IronManSuit suit) {

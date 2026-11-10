@@ -1,4 +1,4 @@
-package edu.stark;
+package edu.stark.tests;
 
 import edu.stark.facade.StarkSuitFacade;
 import edu.stark.missions.MissionScenario;

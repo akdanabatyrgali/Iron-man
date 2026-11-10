@@ -11,7 +11,7 @@ public class DamagedState extends BaseSuitState {
     }
     @Override public ActionResult repair(IronManSuit suit) {
         suit.restoreArmor();
-        suit.setState(new StandbyState());
+        suit.transitionFrom(this, new StandbyState());
         return ActionResult.ok("Armor restored. Suit returned to STANDBY: activate it again.");
     }
 }

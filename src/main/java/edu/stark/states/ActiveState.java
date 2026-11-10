@@ -7,7 +7,7 @@ public class ActiveState extends BaseSuitState {
     @Override public String name() { return "ACTIVE"; }
     @Override public ActionResult startMission(IronManSuit suit) {
         if (suit.energy() == 0) return ActionResult.fail("Not enough energy to begin a mission.");
-        suit.setState(new CombatState());
+        suit.transitionFrom(this, new CombatState());
         return ActionResult.ok("Mission started. Combat mode enabled.");
     }
     @Override public ActionResult fly(IronManSuit suit) {
