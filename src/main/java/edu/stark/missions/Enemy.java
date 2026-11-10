@@ -1,4 +1,4 @@
-package edu.stark.mission;
+package edu.stark.missions;
 
 /** An enemy in the simplified turn-based mission simulation. */
 public class Enemy {

@@ -1,4 +1,4 @@
-package edu.stark.mission;
+package edu.stark.missions;
 
 public enum MissionScenario {
     MONACO(1, "Monaco Emergency", "Whiplash", 80, 18, false),

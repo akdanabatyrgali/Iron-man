@@ -1,4 +1,4 @@
-package edu.stark.mission;
+package edu.stark.missions;
 
 import edu.stark.core.ActionResult;
 import edu.stark.suits.IronManSuit;
