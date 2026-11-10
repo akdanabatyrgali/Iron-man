@@ -5,7 +5,6 @@ import edu.stark.suits.IronManSuit;
 import edu.stark.weapons.WeaponStrategy;
 import java.util.List;
 
-/** Turns attacks, defense, victory and defeat into a cohesive mission. */
 public class MissionSession {
     private final IronManSuit suit;
     private final List<MissionResult> history;
