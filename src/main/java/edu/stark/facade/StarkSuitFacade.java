@@ -2,25 +2,25 @@ package edu.stark.facade;
 
 import edu.stark.commands.*;
 import edu.stark.core.ActionResult;
+import edu.stark.core.GameSnapshot;
+import edu.stark.core.SuitOutputFormatter;
 import edu.stark.missions.MissionSession;
 import edu.stark.missions.MissionResult;
 import edu.stark.missions.MissionScenario;
 import edu.stark.observers.WarningObserver;
-import edu.stark.core.SuitOutputFormatter;
 import edu.stark.suits.*;
 import edu.stark.weapons.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class StarkSuitFacade {
     private final CommandInvoker invoker = new CommandInvoker();
+    private final SuitOutputFormatter formatter = new SuitOutputFormatter();
     private final List<MissionResult> history = new ArrayList<>();
     private IronManSuit suit;
     private WarningObserver warnings;
     private MissionSession mission;
     private WeaponStrategy weapon;
-    private final SuitOutputFormatter formatter = new SuitOutputFormatter();
 
     public ActionResult selectSuit(SuitType type) {
         if (mission != null && mission.inMission()) {
@@ -79,13 +79,44 @@ public class StarkSuitFacade {
     }
 
     public String missionHistory() {
-        if (history.isEmpty()) return "No completed missions yet.";
-        StringBuilder sb = new StringBuilder("MISSION HISTORY\n");
-        for (int i = 0; i < history.size(); i++) {
-            sb.append(i + 1).append(". ").append(history.get(i)).append('\n');
-        }
-        return sb.toString().stripTrailing();
+        return formatter.history(history);
     }
+
+    /** Exposes a read-only snapshot for the REST API without leaking mutable domain objects. */
+    public GameSnapshot snapshot() {
+        if (suit == null) {
+            return GameSnapshot.empty();
+        }
+        boolean activeMission = mission.inMission();
+        var enemy = activeMission ? mission.enemy() : null;
+        var scenario = activeMission ? mission.scenario() : null;
+        return new GameSnapshot(
+                true,
+                suit.type().name(),
+                suit.name(),
+                suit.assistant(),
+                suit.stateName(),
+                suit.energy(),
+                suit.maxEnergy(),
+                suit.armor(),
+                suit.maxArmor(),
+                weapon.type().name(),
+                weapon.type().displayName(),
+                suit.supportedWeapons().stream().map(Enum::name).sorted().toList(),
+                activeMission,
+                scenario == null ? null : scenario.name(),
+                scenario == null ? null : scenario.missionName(),
+                enemy == null ? null : enemy.name(),
+                enemy == null ? 0 : enemy.health(),
+                enemy == null ? 0 : enemy.maxHealth(),
+                enemy != null && enemy.isArmored());
+    }
+
+    /** Used by the persistence service to detect newly completed missions. */
+    public List<MissionResult> completedMissions() {
+        return List.copyOf(history);
+    }
+
     private ActionResult run(Command command) { return addWarnings(invoker.executeCommand(command)); }
     private ActionResult addWarnings(ActionResult result) { return result.add(warnings.drain()); }
     private ActionResult noSuit() { return ActionResult.fail("Select a suit first (menu option 1)."); }
