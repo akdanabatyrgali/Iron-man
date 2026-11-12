@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iron Man Suit Control</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div>
+        <span class="brand">STARK INDUSTRIES</span>
+        <h1>Iron Man Suit Control</h1>
+        <p>Software Design Patterns — Java Web Application</p>
+      </div>
+      <div id="serverStatus" class="server-status">Connecting...</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel" aria-labelledby="suit-title">
+      <div class="section-title">
+        <h2 id="suit-title">1. Select an Iron Man suit</h2>
+        <span class="hint">Factory Method</span>
+      </div>
+      <div class="selection-row">
+        <label for="suitSelect">Suit model</label>
+        <select id="suitSelect"><option>Loading...</option></select>
+        <button id="selectSuitBtn" type="button">Select suit</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="status-title">
+      <div class="section-title">
+        <h2 id="status-title">2. Suit status</h2>
+        <span class="hint">State &amp; Observer</span>
+      </div>
+      <div class="status-grid">
+        <div class="status-item"><span>Current suit</span><strong id="currentSuit">Not selected</strong></div>
+        <div class="status-item"><span>Suit mode</span><strong id="currentState">—</strong></div>
+        <div class="status-item"><span>Assistant</span><strong id="assistant">—</strong></div>
+        <div class="status-item"><span>Weapon</span><strong id="currentWeapon">—</strong></div>
+      </div>
+      <div class="progress-row">
+        <label for="energyBar">Energy: <strong id="energyText">—</strong></label>
+        <progress id="energyBar" value="0" max="100"></progress>
+      </div>
+      <div class="progress-row">
+        <label for="armorBar">Armor: <strong id="armorText">—</strong></label>
+        <progress id="armorBar" value="0" max="100"></progress>
+      </div>
+      <p class="mission-status" id="missionStatus">No active mission.</p>
+    </section>
+
+    <div class="columns">
+      <section class="panel" aria-labelledby="weapon-title">
+        <div class="section-title">
+          <h2 id="weapon-title">3. Choose weapon</h2>
+          <span class="hint">Strategy</span>
+        </div>
+        <label for="weaponSelect">Weapon type</label>
+        <select id="weaponSelect"><option>Loading...</option></select>
+        <button class="secondary" id="selectWeaponBtn" type="button">Choose weapon</button>
+      </section>
+      <section class="panel" aria-labelledby="mission-title">
+        <div class="section-title">
+          <h2 id="mission-title">4. Start a mission</h2>
+          <span class="hint">Mission system</span>
+        </div>
+        <label for="missionSelect">Mission</label>
+        <select id="missionSelect"><option>Loading...</option></select>
+        <button class="secondary" id="startMissionBtn" type="button">Start mission</button>
+      </section>
+    </div>
+
+    <section class="panel" aria-labelledby="actions-title">
+      <div class="section-title">
+        <h2 id="actions-title">5. Actions</h2>
+        <span class="hint">Command &amp; Facade</span>
+      </div>
+      <div class="actions" id="actionButtons">
+        <button type="button" data-action="activate">Activate</button>
+        <button type="button" data-action="attack">Attack</button>
+        <button type="button" data-action="defend">Defend</button>
+        <button type="button" data-action="fly">Fly</button>
+        <button type="button" data-action="recharge">Recharge</button>
+        <button type="button" data-action="repair">Repair</button>
+        <button type="button" class="danger" data-action="retreat">Retreat</button>
+      </div>
+      <div class="result-box" role="status" aria-live="polite">
+        <strong>Java response</strong>
+        <pre id="actionMessage">Choose a suit to begin.</pre>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="history-title">
+      <div class="section-title"><h2 id="history-title">Mission history</h2><span class="hint">H2 Database</span></div>
+      <p class="small-note">Completed missions are saved by Java in the database and shown here.</p>
+      <div id="historyList">No missions completed yet.</div>
+    </section>
+
+    <footer>
+      <p>Java handles the suit logic, attacks, energy, states, warnings and mission results. JavaScript only calls the REST API and displays the response.</p>
+      <p><strong>Patterns:</strong> Factory Method · Observer · State · Strategy · Command · Facade</p>
+    </footer>
+  </main>
+</body>
+</html>
